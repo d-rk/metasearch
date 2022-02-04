@@ -29,7 +29,7 @@ const Header = ({
 }) => (
   <div className="header">
     <form
-      onSubmit={e => {
+      onSubmit={(e) => {
         onSearch(q);
         e.preventDefault();
       }}
@@ -86,11 +86,11 @@ const Settings = ({
             <a href="javascript:;" onClick={() => onSort(id)}>
               {SORT_MODES[id].name}
             </a>
-          ),
+          )
         )
       : null}
     <a href="javascript:;" onClick={onToggleTheme} title="Toggle dark theme">
-      <img src="/theme.png" />
+      <img src="/theme/theme.png" />
     </a>
   </div>
 );
@@ -160,7 +160,10 @@ const Sidebar = ({
                 }
               >
                 <div className="engine-wrap">
-                  <span className="engine-icon" style={{background: `url(/logos/${engine.id}.svg)`}}/>
+                  <span
+                    className="engine-icon"
+                    style={{ background: `url(/logos/${engine.id}.svg)` }}
+                  />
                   {engine.name}
                   {numResults === undefined ? (
                     <span className="spinner">
@@ -214,7 +217,7 @@ const Results = ({
 }) => (
   <div className="results">
     {resultGroups
-      .filter(rg => rg.results.length)
+      .filter((rg) => rg.results.length)
       .map(({ elapsedMs, engineId, results }) => {
         const showResults = !hiddenEngines.includes(engineId);
         return (
@@ -278,24 +281,24 @@ const Results = ({
 
 const memoize = <F extends Function>(fn: F) => {
   let cache: Record<string, any> = {};
-  return (((...args: any[]) => {
+  return ((...args: any[]) => {
     const cacheKey = JSON.stringify(args);
     if (!(cacheKey in cache)) {
       cache[cacheKey] = fn(...args);
     }
     return cache[cacheKey];
-  }) as unknown) as F;
+  }) as unknown as F;
 };
 
 const getResults = memoize(
   async (id: string, q: string): Promise<Result[]> =>
-    await (await fetch(`/api/search?${querify({ engine: id, q })}`)).json(),
+    await (await fetch(`/api/search?${querify({ engine: id, q })}`)).json()
 );
 
 const handleSearch = async (
   dispatch: React.Dispatch<ResultGroup | undefined>,
   q: string,
-  createHistoryEntry: boolean,
+  createHistoryEntry: boolean
 ) => {
   // Normalize and validate query
   q = q.trim().replace(/\s+/, " ");
@@ -317,10 +320,10 @@ const handleSearch = async (
   // Get results
   const highlightRegex = new RegExp(
     q.replace(/\W|_/g, "").split("").join("(\\W|_)*"),
-    "gi",
+    "gi"
   );
   await Promise.all(
-    Object.values(ENGINES).map(async engine => {
+    Object.values(ENGINES).map(async (engine) => {
       // Fetch results
       const start = Date.now();
       const results = await getResults(engine.id, q);
@@ -346,7 +349,7 @@ const handleSearch = async (
       }
 
       dispatch({ elapsedMs: Date.now() - start, engineId: engine.id, results });
-    }),
+    })
   );
 };
 
@@ -389,7 +392,7 @@ const App = () => {
   const [resultGroups, dispatch] = useReducer(
     (state: ResultGroup[], action: ResultGroup | undefined) =>
       action ? [...state, action] : [],
-    [],
+    []
   );
 
   useEffect(() => {
@@ -421,13 +424,13 @@ const App = () => {
         Metasearch
       </div>
       <Header
-        onChange={e => setQ(e.target.value)}
-        onSearch={q => handleSearch(dispatch, q, !!getUrlQ().trim())}
+        onChange={(e) => setQ(e.target.value)}
+        onSearch={(q) => handleSearch(dispatch, q, !!getUrlQ().trim())}
         q={q}
       />
       <Settings
         enableSorting={resultGroups.length > 0}
-        onSort={sortMode => setLocalData({ ...localData, sortMode })}
+        onSort={(sortMode) => setLocalData({ ...localData, sortMode })}
         onToggleTheme={() =>
           setLocalData({ ...localData, dark: !localData.dark })
         }
@@ -436,12 +439,12 @@ const App = () => {
       <Sidebar
         visible={resultGroups.length > 0}
         hiddenEngines={localData.hiddenEngines || []}
-        onToggle={engineId => {
+        onToggle={(engineId) => {
           const hiddenEngines = localData.hiddenEngines || [];
           setLocalData({
             ...localData,
             hiddenEngines: hiddenEngines.includes(engineId)
-              ? hiddenEngines.filter(id => id !== engineId)
+              ? hiddenEngines.filter((id) => id !== engineId)
               : [...hiddenEngines, engineId].sort(),
           });
         }}
@@ -449,12 +452,12 @@ const App = () => {
       />
       <Results
         hiddenEngines={localData.hiddenEngines || []}
-        onToggle={engineId => {
+        onToggle={(engineId) => {
           const hiddenEngines = localData.hiddenEngines || [];
           setLocalData({
             ...localData,
             hiddenEngines: hiddenEngines.includes(engineId)
-              ? hiddenEngines.filter(id => id !== engineId)
+              ? hiddenEngines.filter((id) => id !== engineId)
               : [...hiddenEngines, engineId].sort(),
           });
         }}
