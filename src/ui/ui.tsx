@@ -160,6 +160,7 @@ const Sidebar = ({
                 }
               >
                 <div className="engine-wrap">
+                  <span className="engine-icon" style={{background: `url(/logos/${engine.id}.svg)`}}/>
                   {engine.name}
                   {numResults === undefined ? (
                     <span className="spinner">
